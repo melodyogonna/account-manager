@@ -5,6 +5,7 @@ import { Account, AccountData, AccountFactory } from "../../../core/account";
 import { BadOperationError, EntityExistsError } from "../../error";
 
 
+let instatiated: AccountMemoryRepository | null = null;
 
 export class AccountMemoryRepository {
   private accounts: AccountData[] = [];
@@ -53,4 +54,14 @@ export class AccountMemoryRepository {
     }
     return returnedAccounts
   }
+
+  static new(): AccountMemoryRepository {
+    if (!instatiated) {
+      instatiated = new AccountMemoryRepository();
+      return instatiated;
+    }
+    return instatiated
+  }
 }
+
+
