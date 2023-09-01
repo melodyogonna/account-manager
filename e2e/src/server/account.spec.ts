@@ -8,7 +8,7 @@ describe('GET /', () => {
       initial_balance: 100,
       type: 'checking'
     }
-    const res = await axios.post(`/api/v1/create`, input);
+    const res = await axios.post(`/api/v1/accounts/create`, input);
 
     expect(res.status).toBe(201);
   });
@@ -16,7 +16,7 @@ describe('GET /', () => {
   it('Fail validation', async () => {
     const input = {
     }
-    const res = await axios.post(`/api/v1/create`, input);
+    const res = await axios.post(`/api/v1/accounts/create`, input);
 
     expect(res.status).toBe(400);
   });

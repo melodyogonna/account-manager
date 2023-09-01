@@ -1,4 +1,5 @@
 import { z } from "zod";
+import validator from 'validator'
 
 import { BadOperationError } from "../../../shared/error";
 
@@ -45,14 +46,15 @@ export class NewAccountService {
   private validateInputs(data: AccountInput) {
     const accountSchema = z.object({
       holder_name: z.string(),
-      holder_dob: z.date(),
+      holder_dob: z.string().refine(v => validator.isDate(v), { message: 'DOB Must be a valid date' }),
       initial_balance: z.number().gt(1),
       account_type: z.enum(["saving", "current", "checking"])
     })
 
     const result = accountSchema.safeParse(data);
     if (!result.success) {
-      throw new BadOperationError("")
+      const error = result.error.flatten()
+      throw new BadOperationError("Unable to create account", error.fieldErrors)
     }
     return result.data
   }
