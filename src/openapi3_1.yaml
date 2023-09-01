@@ -1,0 +1,168 @@
+openapi: 3.1.0
+info:
+  title: Account Manager API
+  description: >-
+    This documents a simple API which allows a user to simulate creating bank
+    accounts.
+  contact:
+    email: melodyogonna@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:3000/api/v1
+tags:
+  - name: AccountManager
+  - name: Account
+    description: user bank account manager
+paths:
+  /accounts:
+    get:
+      tags:
+        - Account
+      summary: Get accounts
+      description: Get accounts on the platform
+      operationId: GetAccounts
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiArrayResponse'
+  
+  /accounts/{accountNumber}:
+    get:
+      tags:
+        - Account
+      summary: Find an account using the account number
+      operationId: findAccountWithNumber
+      parameters:
+        - name: accountNumber
+          in: path
+          description: Account number to search for
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: 
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSingleResponse'
+        '400':
+          description: Invalid account number
+        '404':
+          description: Account not found
+
+  /accounts/create:   
+    post:
+      tags:
+        - Account
+      summary: Create a new account
+      description: ''
+      operationId: createAccount
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/AccountInput'
+      responses:
+        '201':
+          description: Account created
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ApiSingleResponse'
+        '400':
+          description: Invalid input
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/APIErrorResponse'
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+    
+components:
+  schemas:
+    AccountInput:
+      type: object
+      properties:
+        holder_name:
+          type: string
+          examples:
+            - John Doe
+        holder_dob:
+          type: string
+          format: date
+          examples:
+            - "1960/10/21"
+        initial_balance:
+          type: integer
+          format: int32
+          examples:
+            - 20
+        account_type:
+          type: string
+          description: Type of bank account
+          examples: 
+            - saving
+          enum:
+            - saving
+            - checking
+            - current
+
+    AccountOutput:
+      type: object
+      properties:
+        accountNumber:
+          type: string
+          examples:
+            - "23499593"
+        type:
+          type: string
+          examples:
+            - saving
+        balance:
+          type: integer
+          format: int32
+        name:
+          type: string
+          description: Name of account owner
+        bank:
+          type: string
+          description: Bank name
+   
+    ApiSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: '#/components/schemas/AccountOutput'
+        message:
+          type: string
+    ApiArrayResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items: 
+            $ref: '#/components/schemas/AccountOutput'
+        message:
+          type: string
+    APIErrorResponse:
+      type: object
+      properties: 
+        message:
+          type: string
+        error:
+          type: array
